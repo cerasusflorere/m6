@@ -15,4 +15,5 @@
    <a href="m6-pre-create.php" target="_blank">初めての方はこちら</a><br>
    <a href="m6-foget-username-form.php" target="_blank">ユーザー名をお忘れの方はこちら</a><br>
    <a href="m6-forget-password-form.php" target"_blank">パスワードをお忘れの方はこちら</a>
+ </body>
 </html>
