@@ -42,7 +42,7 @@
 	            $nowdate = date('YYYY-MM-DD HH:MM:SS');
 	            //flagが0の未登録者 or 仮登録日から24時間以内
 			    $sql_confirm = "SELECT email FROM pre_user WHERE urltoken=(:urltoken) AND flag =0 AND date > $nowdate - interval 24 hour";
-                $stmt_confirm = $pdo->prepare($sql_confirm);
+                            $stmt_confirm = $pdo->prepare($sql_confirm);
 			    $stmt_confirm->bindValue(':urltoken', $urltoken, PDO::PARAM_STR);
 			    $stmt_confirm->execute();
 			    $count_confirm = $stmt_confirm -> rowCount();
