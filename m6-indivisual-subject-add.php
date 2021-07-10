@@ -19,7 +19,6 @@
          // ・データベース名：***
          // ・ユーザー名：***
          // ・パスワード：***
-         // の学生の場合：
 
          // DB接続設定
          $dsn = 'mysql:dbname=***;host=***';
@@ -30,10 +29,10 @@
          $stages_array = array();
          $flag = 0;
 
-         if(empty($_GET)){
+        /* if(empty($_GET)){
              header("Location:m6-login-form.php");
              exit();
-         }else{
+         }else{*/
              $username = isset($_SESSION["username"]) ? $_SESSION["username"] : NULL;
              
              $sql_stages = "SELECT * FROM '{$username}'";
@@ -47,7 +46,7 @@
                  $stages_array .= "'>". $stages_array_val. "</option>";
              }
              $flag = 1;
-         }
+        // }
         
         /**
          * 確認する（btn_confirm）を押した後の処理
@@ -57,31 +56,63 @@
                  header('Location:m6-login-form.php');
                  exit();
              }else{
-                 $_SESSION['performance'] = $_POST['performance'];
-                 $_SESSION['date'] = $_POST['date'];
-                 $_SESSION['open_time'] = $_POST['open_time'];
-                 $_SESSION['close_time'] = $_POST['close_date'];
-                 $_SESSION['stage'] = $_POST['stage'];
-                 $_SESSION['oraganizer'] = $_POST['organizer'];
-                 $_SESSION['director'] = $_POST['director'];
-                 $_SESSION['author'] = $_POST['author'];
-                 $_SESSION['cloth'] = $_POST['cloth'];
-                 $_SESSION['light'] = $_POST['light'];
-                 $_SESSION['property'] = $_POST['property'];
-                 $_SESSION['firstdate'] = $_POST['firstdate'];
-                 $_SESSION['finaldate'] = $_POST['finaldate'];
-                 $_SESSION['players'] = $_POST['players'];
-                 $_SESSION['scenario'] = $_POST['scenario'];
-                 $_SESSION['impression_all'] = $_POST['impression_all'];
-                 for($i = 1; $i < )
-                 
-                 $_SESSION['impression_final'] = $_POST['impression_all'];
-                 
+                 $_SESSION['performance'] = isset($_POST['performance']) ? $_POST['performance'] : NULL;
+                 $_SESSION['date'] = isset($_POST['date']) ? $_POST['date'] : NULL;
+                 $_SESSION['open_time'] = isset($_POST['open_time']) ? $_POST['open_time'] : NULL;
+                 $_SESSION['close_time'] = isset($_POST['close_time']) ? $_POST['close_date'] : NULL;
+                 $_SESSION['stage'] = isset($_POST['stage']) ? $_POST['stage'] : NULL;
+                 $_SESSION['oraganizer'] = isset($_POST['organizer']) ? $_POST['organizer'] : NULL;
+                 $_SESSION['director'] = isset($_POST['director']) ? $_POST['director'] : NULL;
+                 $_SESSION['author'] = isset($_POST['author']) ? $_POST['author'] : NULL;
+                 $_SESSION['cloth'] = isset($_POST['cloth']) ? $_POST['cloth'] : NULL;
+                 $_SESSION['light'] = isset($_POST['light']) ? $_POST['light'] : NULL;
+                 $_SESSION['property'] = isset($_POST['property']) ? $_POST['property'] : NULL;
+                 $_SESSION['firstdate'] = isset($_POST['firstdate']) ? $_POST['firstdate'] : NULL;
+                 $_SESSION['finaldate'] = isset($_POST['finaldate']) ? $_POST['finaldate'] : NULL;
+                 $_SESSION['players'] = isset($_POST['players']) ? $_POST['players']: NULL;
+                 $_SESSION['scenario'] = isset($_POST['scenario']) ? $_POST['scenario']: NULL;
+                 $_SESSION['impression_all'] = isset($_POST['impression_all']) ? $_POST['impression_all'] : NULL;
+                 for($i = 1; $i <= 50; $i++){
+                     if(isset($_POST['player_impression_['.$i.']'])){
+                         $_SESSION['player_impression_['.$i.']'] = $_POST['player_impression_['.$i.']'];
+                     }else{
+                         break;
+                     }
+                 }
+                 for($i = 1; $i <= 50; $i++){
+                     if(isset($_POST['impression_player_['.$i.']'])){
+                         $_SESSION['impression_player_['.$i.']'] = $_POST['impression_player_['.$i.']'];
+                     }else{
+                         break;
+                     }
+                 }
+                 for($i = 1; $i <= 50; $i++){
+                     if(isset($_POST['impression_scene_['.$i.']'])){
+                         $_SESSION['impression_scene_['.$i.']'] = $_POST['impression_scene_['.$i.']'];
+                     }else{
+                         break;
+                     }
+                 }
+                 $_SESSION['impression_final'] = isset($_POST['impression_final']) ? $_POST['impression_final'] : NULL;
+                 for($i = 1; $i <= 10; $i++){
+                     if(isset($_POST['rerated_performances_['.$i.']'])){
+                         $_SESSION['rerated_performances_['.$i.']'] = $_POST['rerated_performances_['.$i.']'];
+                     }else{
+                         break;
+                     }
+                 }
+                 for($i = 1; $i <= 20; $i++){
+                     if(isset($_POST['picture_['.$i.']'])){
+                         $_SESSION['picture_['.$i.']'] = $_POST['picture_['.$i.']'];
+                     }else{
+                         break;
+                     }
+                 }
              }
          }
      
 
-
+echo <<<EOM
 <script type="text/javascript">
      document.write("Samurai");
      $(function(){
@@ -97,7 +128,7 @@
          });
      });  
 </script>
-
+EOM;
 ?>
 <html>
 <body>     
@@ -130,7 +161,7 @@
 				   <p>好きな場面とその理由：<? $_SESSION['impression_scene[]'] ?></p>
 	   			   <p>最後に：<? $_SESSION['impression_final'] ?></p>
 	   			   <p>関連のある公演：<? $_SESSION['rerated_performances_[]'] ?></p>
-                   <p>画像：<? $_SESSION['picture_[]'] ?></p>
+                                   <p>画像：<? $_SESSION['picture_[]'] ?></p>
              
              <input type="submit" name="btn_back" value="戻る">
              <input type="submit" name="btn_submit" value="登録する">
@@ -150,8 +181,8 @@
 				   <p>演出：<input type="text" name="director" value="<?php if( !empty($_SESSION['value']) ){ echo $_SESSION['value']; } ?>"></p>
 				   <p>作家：<input type="text" name="author" value="<?php if( !empty($_SESSION['author']) ){ echo $_SESSION['author']; } ?>"></p>
 				   <p>振付：<input type="text" name="dance" value="<?php if( !empty($_SESSION['dance']) ){ echo $_SESSION['dance']; } ?>"></p>
-                   <p>音楽：<input type="text" name="music" value="<?php if( !empty($_SESSION['music']) ){ echo $_SESSION['music']; } ?>"></p>
-                   <p>作詞：<input type="text" name="lyrics" value="<?php if( !empty($_SESSION['lyrics']) ){ echo $_SESSION['lyrics']; } ?>"></p>
+                                   <p>音楽：<input type="text" name="music" value="<?php if( !empty($_SESSION['music']) ){ echo $_SESSION['music']; } ?>"></p>
+                                   <p>作詞：<input type="text" name="lyrics" value="<?php if( !empty($_SESSION['lyrics']) ){ echo $_SESSION['lyrics']; } ?>"></p>
 				   <p>衣装：<input type="text" name="cloth" value="<?php if( !empty($_SESSION['cloth']) ){ echo $_SESSION['cloth']; } ?>"></p>
 				   <p>照明：<input type="text" name="light" value="<?php if( !empty($_SESSION['light']) ){ echo $_SESSION['light']; } ?>"></p>
 				   <p>小道具：<input type="text" name="property" value="<?php if( !empty($_SESSION['property']) ){ echo $_SESSION['property']; } ?>"></p>
