@@ -12,7 +12,7 @@
              header('X-FRAME-OPTIONS: SAMEORIGIN'); 
              
          $_SESSION = array();
-         session_destroy();
+         @session_destroy();
     ?>
 <p>ログアウトしました。</p>
 <a href = "m6-login-form.php">ログインへ</a>
