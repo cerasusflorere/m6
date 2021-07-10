@@ -28,7 +28,7 @@
          . "urltoken varchar(280),"
          . "email varchar(280),"
          . "date DATETIME,"
-         . "flag tinyint"
+         . "flag int"
          .");";
          $stmt_pre = $pdo->query($sql_pre);
          
@@ -85,10 +85,10 @@
 			         $errors['user_check'] = "このメールアドレスはすでに利用されております。";
                  }
                  
-                 //エラーがない場合、pre_userテーブルに挿入する
+                 //エラーがない場合、pre_userテーブルにインサート
                  if (count($errors) === 0){
                      $urltoken = hash('sha256',uniqid(rand(),1));
-                     $url = "http://localhost:10011/m6-create.php?urltoken=".$urltoken;
+                     $url = "https://tech-base.net/tb-230045/m6/m6-create.php?urltoken=".$urltoken;
                      $receivernamearray = explode("@", $email);
                      $receivername = $receivernamearray[0];
                      $_SESSION['email'] = $email;
@@ -96,10 +96,12 @@
                      // データベースに登録する
                      try{
                          $newdate = date('Y-m-d H:i:s');
-                         $stmtpre = $pdo -> prepare("INSERT  INTO pre_user (urltoken, email, date, flag) VALUES (:urltoken, :email, :date, '0')");
+                         $flag = 0;
+                         $stmtpre = $pdo -> prepare("INSERT  INTO pre_user (urltoken, email, date, flag) VALUES (:urltoken, :email, :date, :flag)");
                          $stmtpre -> bindParam(':urltoken', $urltoken, PDO::PARAM_STR);
                          $stmtpre -> bindParam(':email', $email, PDO::PARAM_STR);
                          $stmtpre -> bindParam(':date', $newdate, PDO::PARAM_STR);
+                         $stmtpre -> bindParam(':flag', $flag, PDO::PARAM_INT);
                          $stmtpre -> execute();
                          
                          $_SESSION['body'] = $receivername."様<br>この度はご利用くださりありがとうございます。<br>下記URLにて24時間以内に本登録をお済ませください。<br>".$url;
@@ -107,6 +109,21 @@
                          require_once 'phpmailer/send_test.php';
                          
                          $message = "メールをお送りしました。24時間以内にメールに記載されたURLからご登録下さい。";     
+                         
+                         //データベースの接続切断
+                         $stmtpre = NULL;
+             
+                         //セッション変数をすべて解除
+                         $_SESSION = array();
+             
+                         //セッションクッキーの削除
+                         if (isset($_COOKIE["PHPSESSID"])) {
+				             setcookie("PHPSESSID", '', time() - 1800, '/');
+                         }
+		     
+		                 //セッションを破棄する
+		                 session_destroy();
+
                      }catch (PDOException $e){
                          print('Error:'.$e->getMessage());
                          die();
