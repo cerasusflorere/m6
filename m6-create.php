@@ -41,14 +41,14 @@
 	         }else{
 	            $nowdate = date('YYYY-MM-DD HH:MM:SS');
 	            //flagが0の未登録者 or 仮登録日から24時間以内
-			    $sql_confirm = "SELECT email FROM pre_user WHERE urltoken=(:urltoken) AND flag =0 AND date > $nowdate - interval 24 hour";
+			    $sql_confirm = "SELECT email FROM pre_user WHERE urltoken=(:urltoken) AND flag = 0 AND date > now() - interval 24 hour";
                             $stmt_confirm = $pdo->prepare($sql_confirm);
 			    $stmt_confirm->bindValue(':urltoken', $urltoken, PDO::PARAM_STR);
 			    $stmt_confirm->execute();
 			    $count_confirm = $stmt_confirm -> rowCount();
 			 
 		    	//24時間以内に仮登録され、本登録されていないトークンの場合
-			    if($count_confirm ===　1){
+			    if($count_confirm ==　1){
 				     $email_array = $stmt_confirm -> fetch();
 				     $email = $email_array["email"];
 				     $_SESSION['email'] = $email;
@@ -56,10 +56,6 @@
 				     $errors['urltoken_timeover'] = "このURLはご利用できません。有効期限が過ぎたかURLが間違えている可能性がございます。もう一度登録をやりなおして下さい。";
 		   	    }
 		   	    
-		   	    //パスワードチェック
-		   	    if($_POST['password'] != $_POST['password_confirm']){
-		   	        $errors['passwor_check'] = "パスワードが一致していません。";
-		   	    }
              }
          }
          
@@ -75,6 +71,7 @@
                  //POSTされたデータを変数に入れる
                  $name = isset($_POST['username']) ? $_POST['username']:NULL;
                  $password = isset($_POST['password']) ? $_POST['password']:NULL;
+                 $password_confirm = isset($_POST['password_confirm']) ? $_POST['password_confirm']:NULL;
                  
                  //セッションに登録
                  $_SESSION['username'] = $name;
@@ -82,7 +79,11 @@
                  
                  //アカウント入力判定
                  //パスワード入力判定
-                 if($password === "" || $username === ""){
+                 if($password != $password_confirm){
+                     $errors['password_confirm'] = "パスワードが一致しません。";
+                 }
+                 
+                 if(count($errors) == 0 && ($password === "" || $username === "")){
                      if($password === ""){
                          $errors['password'] = "パスワードが入力されていません。";
                      }else{
@@ -179,7 +180,7 @@
          <?php endif; ?>
              <?php if(!isset($errors['urltoken_timeover'])): ?>
                 <form action="<?php echo $_SERVER['SCRIPT_NAME'] ?>?urltoken=<?php print $urltoken; ?>" method="post">
-				   <p>メールアドレス：    <?=htmlspecialchars($mail, ENT_QUOTES, 'UTF-8')?></p>
+				   <p>メールアドレス：    <?=htmlspecialchars($email, ENT_QUOTES, 'UTF-8')?></p>
 				   <p>ユーザー名：        <input type="text" name="name" value="<?php if( !empty($_SESSION['name']) ){ echo $_SESSION['name']; } ?>"></p>
 				   <p>パスワード：        <input type="password" name="password"></p>
 				   <p>パスワード（確認）：<input type="password" name="confirm_password"></p>
