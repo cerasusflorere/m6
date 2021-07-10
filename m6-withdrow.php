@@ -91,16 +91,18 @@
                  $sql_withdrow = "delete from user  WHERE email=:email AND username=:username AND password=:password";
                  $stmt_withdrow = $pdo -> prepare($sql_withdrow);
                  $stmt_withdrow -> bindValue(':email', $email, PDO::PARAM_STR);
+                 $stmt_withdrow -> bindValue(':password', $password, PDO::PARAM_STR);
                  $stmt_withdrow -> execute();
              
                  //このユーザーテーブルを削除する
-                 $sql_withdrow_username = "DROP TABLE '{$username}'";
+                 define('table_name', $username)
+                 $sql_withdrow_username = "DROP TABLE table_name";
                  $stmt_withdrow_username = $pdo -> prepare($sql_withdrow_username);
                  $stmt_withdrow_username -> execute();
              
                  //データベースの接続切断
-                 $stmt_registerate = NULL;
-                 $stmt_pre = NULL;
+                 $stmt_withdrow = NULL;
+                 $stmt_withdrow_username = NULL;
              
                  //セッション変数をすべて解除
                  $_SESSION = array();
