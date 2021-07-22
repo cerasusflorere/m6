@@ -26,6 +26,7 @@
          $user = '***';
          $password = '***';
          $pdo = new PDO($dsn, $user, $password, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING));
+         
          // 成功・エラーメッセージの初期化
          $errors = array();
          
@@ -37,26 +38,28 @@
              if($username != "" && $password != ""){
                  $sql_login = "SELECT * FROM user WHERE username=:username";
                  $stmt_login = $pdo -> prepare($sql_login);
-                 $stmt_login -> bindValue(':username', $username);
+                 $stmt_login -> bindParam(':username', $username, PDO::PARAM_STR);
                  $stmt_login -> execute();
                  $count_login = $stmt_login -> rowCount();
                  
                  if($count_login === 1){
                      $sql_password = "SELECT * FROM user WHERE username=:username";
                      $stmt_password = $pdo -> prepare($sql_password);
-                     $stmt_password -> bindValue(':username', $username);
+                     $stmt_password -> bindParam(':username', $username, PDO::PARAM_STR);
                      $stmt_password -> execute();
                      $members = $stmt_password -> fetchAll();
                      
                      foreach($members as $member){
                          $id = $member['id'];
+                         $userid = $member['userid'];
                          $correct_password = $member['password'];
                      }
                      // 指定したハッシュがパスワードとあっているか
                      if(password_verify($password, $correct_password)){
                          // データベースの値をセッションに保存
                          $_SESSION['id'] = $id;
-                         $_SESSION['username'] = $correct_password;
+                         $_SESSION['userid'] = $userid;
+                         $_SESSION['username'] = $username;
                          
                          header("Location:m6-indivisual-home.php");
                          exit();
@@ -77,6 +80,7 @@
          }
      ?>
  <body>
+         <h1>ようこそ、ログインしてください。</h1>
          <?php if(count($errors) > 0):?>
              <?php 
                  foreach($errors as $value){
@@ -84,7 +88,6 @@
                  }
              ?>
          <?php endif; ?>
-         <h1>ようこそ、ログインしてください。</h1>
          <form  action="" method="post">
 		     <p>ユーザー名：<input type="text" name="username"></p>
 		     <p>パスワード：<input type="password" name="password"></p>
