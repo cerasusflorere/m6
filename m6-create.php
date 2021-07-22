@@ -20,7 +20,7 @@
          // ・データベース名：***
          // ・ユーザー名：***
          // ・パスワード：***
-	
+
          // DB接続設定
          $dsn = 'mysql:dbname=***;host=***';
          $user = '***';
@@ -67,7 +67,6 @@
 			    }else{
 				     $errors['urltoken_timeover'] = "このURLはご利用できません。有効期限が過ぎたかURLが間違えている可能性がございます。もう一度登録をやりなおして下さい。";
 		   	    }
-		   	    
              }
          }
          
@@ -84,11 +83,7 @@
                  $username = isset($_POST['username']) ? $_POST['username']:NULL;
                  $password = isset($_POST['password']) ? $_POST['password']:NULL;
                  $confirm_password = isset($_POST['confirm_password']) ? $_POST['confirm_password']:NULL;
-                 
-                 //セッションに登録
-                 
-                 
-                 
+  
                  //アカウント入力判定
                  //パスワード入力判定
                  if($username == "" || $password == "" || $confirm_password == ""){
@@ -137,25 +132,41 @@
              $password_hash = password_hash($_SESSION['password'], PASSWORD_DEFAULT);
              $email = $_SESSION['email'];
              $username = $_SESSION['username'];
+             $sql_confirm_user = "SELECT * FROM user";
+             $stmt_confirm_user = $pdo -> query($sql_confirm_user);
+             $stmt_confirm_user -> execute();
+             $count_confirm_user = $stmt_confirm_user -> rowCount();
+			 
+             $userid = 1;
+             if($count_confirm_user >= 1){
+                 $sql_userid = "SELECT * FROM user ORDER BY id DESC LIMIT 1";
+                 $stmt_userid = $pdo -> query($sql_id);
+                 $results_userid = $stmt_userid -> fetchAll();
+                 $userid = 0;
+                 foreach($results_userid as $result_userid){
+                     $userid = $result_userid['userid'] + 1;
+                 }
+             }
              
             //ここでデータベースに登録する
             try{
                  $newdate = date('Y-m-d H:i:s');
                  $newstatus = 1;
-                 $sql_registerate = "INSERT INTO user (email, username, password, status, createddate, updateddate) VALUES(:email, :username, :password, :status, :createddate, :updateddate)";
+                 $sql_registerate = "INSERT INTO user (email, userid, username, password, status, createddate, updateddate) VALUES(:email, :userid, :username, :password, :status, :createddate, :updateddate)";
                  $stmt_registerate = $pdo -> prepare($sql_registerate);
-                 $stmt_registerate -> bindValue(':email', $email, PDO::PARAM_STR);
-                 $stmt_registerate -> bindValue(':username', $username, PDO::PARAM_STR);
-                 $stmt_registerate -> bindValue(':password', $password_hash, PDO::PARAM_STR);
-                 $stmt_registerate -> bindValue(':status', $newstatus, PDO::PARAM_INT);
-                 $stmt_registerate -> bindValue(':createddate', $newdate, PDO::PARAM_STR);
-                 $stmt_registerate -> bindValue(':updateddate', $newdate, PDO::PARAM_STR);
+                 $stmt_registerate -> bindParam(':email', $email, PDO::PARAM_STR);
+                 $stmt_registerate -> bindParam(':userid', $userid, PDO::PARAM_INT);
+                 $stmt_registerate -> bindParam(':username', $username, PDO::PARAM_STR);
+                 $stmt_registerate -> bindParam(':password', $password_hash, PDO::PARAM_STR);
+                 $stmt_registerate -> bindParam(':status', $newstatus, PDO::PARAM_INT);
+                 $stmt_registerate -> bindParam(':createddate', $newdate, PDO::PARAM_STR);
+                 $stmt_registerate -> bindParam(':updateddate', $newdate, PDO::PARAM_STR);
                  $stmt_registerate -> execute();
              
                  //pre_userのflagを１にする（トークンの無効化）
                  $sql_pre = "UPDATE pre_user SET flag=1 WHERE email=:email";
                  $stmt_pre = $pdo -> prepare($sql_pre);
-                 $stmt_pre -> bindValue('email', $email, PDO::PARAM_STR);
+                 $stmt_pre -> bindParam('email', $email, PDO::PARAM_STR);
                  $stmt_pre -> execute();
              
                  //データベースの接続切断
@@ -194,7 +205,7 @@
    <?php elseif(isset($_POST['btn_confirm']) && count($errors) == 0): ?>
          <form action="<?php echo $_SERVER['SCRIPT_NAME'] ?>?urltoken=<?php print $urltoken; ?>" method="post">
              <p>メールアドレス: <?=htmlspecialchars($_SESSION['email'], ENT_QUOTES)?></p>
-             <p>ユーザー名: <?=  $_SESSION['username'] ?></p>
+             <p>ユーザー名: <?= $_SESSION['username'] ?></p>
              <p>パスワード: <?=$_SESSION['password_hide']?></p>
              
              <input type="submit" name="btn_back" value="戻る">
@@ -204,13 +215,12 @@
    
    
      <!-- page1 登録画面 -->
-         <?php if(count($errors) > 0):?>
+         <?php elseif(count($errors) > 0):?>
              <?php 
              foreach($errors as $value){
-                 echo "<p class='error'>".$value."</p>";
+                 echo $value.PHP_EOL;
              }
              ?>
-         <?php endif; ?>
     <?php elseif(!isset($errors['urltoken_timeover'])): ?>
                 <form action="<?php echo $_SERVER['SCRIPT_NAME'] ?>?urltoken=<?php print $urltoken; ?>" method="post">
 				   <p>メールアドレス：    <?=htmlspecialchars($email, ENT_QUOTES, 'UTF-8')?></p>
