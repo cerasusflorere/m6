@@ -6,6 +6,7 @@
 </head>
 </html>
      <?php 
+         session_start();
          //クロスサイトリクエストフォージェリ（CSRF）対策
              $_SESSION['token'] = base64_encode(openssl_random_pseudo_bytes(32));
              $token = $_SESSION['token'];
@@ -27,12 +28,11 @@
          $pdo = new PDO($dsn, $user, $password, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING));
          
          $errors = [];
-         $stages_array = [];
          $flag = 0;
-         $i = 0;
+         $stages_array = [];
+         $numbers = 0;
          
          $userid = isset($_SESSION['userid']) ? $_SESSION['userid'] : NULL;
-         echo $useid;
               
          $sql_stages = "SELECT * FROM impression WHERE userid=:userid";
          $stmt_stages = $pdo -> prepare($sql_stages);
@@ -40,12 +40,12 @@
          $results_stages = $stmt_stages -> fetchAll();
          if(is_array($results_stages)){
              foreach($results_stages as $row_stages){
-         　       $stages_array[$i] = $row_stages['performance'];
-         　       $i++;
+                 $stages_array[$numbers] = $row_stages['performance'];
+                 $numbers++;
              }
              foreach($stages_array as $stages_array_key => $stages_array_val){
-         　       $stages_array .= "<option value='". $stages_array_key;
-                 $stages_array .= "'>". $stages_array_val. "</option>";
+                 $stages_array .= "<option value='".$stages_array_key;
+                 $stages_array .= "'>".$stages_array_val."</option>";
              }
          }
 
@@ -84,9 +84,6 @@
                  if($i <= 10){
                      $_SESSION['related_performances_['.$i.']'] = isset($_POST['related_performances_['.$i.']']) ? $_POST['rerated_performances_['.$i.']'] : NULL;
                  }
-                 if($i <= 30){
-                     $_SESSION['picture_['.$i.']'] = isset($_POST['picture_['.$i.']']) ? $_POST['picture_['.$i.']'] : NULL;
-                 }
              }
              $_SESSION['impression_final'] = isset($_POST['impression_final']) ? $_POST['impression_final'] : NULL;
          }
@@ -98,8 +95,6 @@
              $userid = isset($_SESSION['userid']) ? $_SESSION['userid'] : NULL;
              echo $userid;
              if($userid !== NULL){
-                 $username = isset($_SESSION['username']) ? $_SESSION['username'] : NULL;
-                 
                  $performance = $_SESSION['performance'];
                  $theater = $_SESSION['theater'];
                  $date = $_SESSION['date'];
@@ -122,14 +117,11 @@
                  $scenario = $_SESSION['scenario'];
                  $impression_all = $_SESSION['impression_all'];
                  for($i = 1; $i < 51; $i++){
-                     $player_impression[$i] = $_SESSION['player_impression_['.$i.']'];
-                     $impression_player[$i] = $_SESSION['impression_player_['.$i.']'];
-                     $impression_scene[$i] = $_SESSION['impression_scene_['.$i.']'];
+                     $player_impression[$i] = $_SESSION["player_impression_[{$i}]"];
+                     $impression_player[$i] = $_SESSION["impression_player_[{$i}]"];
+                     $impression_scene[$i] = $_SESSION["impression_scene_[{$i}]"];
                      if($i < 11){
-                         $related_performances[$i] = $_SESSION['related_performances_['.$i.']'];
-                     }
-                     if($i <= 30){
-                         $picture[$i] = $_SESSION['picture_['.$i.']'];
+                         $related_performances[$i] = $_SESSION["related_performances_[{$i}]"];
                      }
                  }
                  $impression_final = $_SESSION['impression_final'];             
@@ -137,79 +129,79 @@
                  try{
                      $sql_add = $pdo -> prepare("INSERT INTO impression 
                                                    (userid, performance, theater, date, open_time, close_time, stage, seat,
-                                                    first_day, final_day, organizer, director, author, dance,
+                                                    first_date, final_date, organizer, director, author, dance,
                                                     music, lyrics, cloth, light, property, players, scenario, impression_all,
-                                                    player_impression[1], player_impression[2], player_impression[3], player_impression[4], player_impression[5], player_impression[6], player_impression[7], player_impression[8], player_impression[9], player_impression[10], 
-                                                    player_impression[11], player_impression[12], player_impression[13], player_impression[14], player_impression[15], player_impression[16], player_impression[17], player_impression[18], player_impression[19], player_impression[20], 
-                                                    player_impression[21], player_impression[22], player_impression[23], player_impression[24], player_impression[25], player_impression[26], player_impression[27], player_impression[28], player_impression[29], player_impression[30], 
-                                                    player_impression[31], player_impression[32], player_impression[33], player_impression[34], player_impression[35], player_impression[36], player_impression[37], player_impression[38], player_impression[39], player_impression[40], 
-                                                    player_impression[41], player_impression[42], player_impression[43], player_impression[44], player_impression[45], player_impression[46], player_impression[47], player_impression[48], player_impression[49], player_impression[50], 
-                                                    impression_player[1], impression_player[2], impression_player[3], impression_player[4], impression_player[5], impression_player[6], impression_player[7], impression_player[8], impression_player[9], impression_player[10], 
-                                                    impression_player[11], impression_player[12], impression_player[13], impression_player[14], impression_player[17], impression_player[18], impression_player[19], impression_player[20], 
-                                                    impression_player[21], impression_player[22], impression_player[23], impression_player[24], impression_player[25], player_impression[26], player_impression[27], impression_player[28], impression_player[29], impression_player[30], 
-                                                    impression_player[31], impression_player[32], impression_player[33], impression_player[34], impression_player[35], player_impression[36], player_impression[37], impression_player[38], impression_player[39], impression_player[40], 
-                                                    impression_player[41], impression_player[42], impression_player[43], impression_player[44], impression_player[45], player_impression[46], player_impression[47], impression_player[48], impression_player[49], impression_player[50], 
+                                                    player_impression_1, player_impression_2, player_impression_3, player_impression_4, player_impression_5, player_impression_6, player_impression_7, player_impression_8, player_impression_9, player_impression_10, 
+                                                    player_impression_11, player_impression_12, player_impression_13, player_impression_14, player_impression_15, player_impression_16, player_impression_17, player_impression_18, player_impression_19, player_impression_20, 
+                                                    player_impression_21, player_impression_22, player_impression_23, player_impression_24, player_impression_25, player_impression_26, player_impression_27, player_impression_28, player_impression_29, player_impression_30, 
+                                                    player_impression_31, player_impression_32, player_impression_33, player_impression_34, player_impression_35, player_impression_36, player_impression_37, player_impression_38, player_impression_39, player_impression_40, 
+                                                    player_impression_41, player_impression_42, player_impression_43, player_impression_44, player_impression_45, player_impression_46, player_impression_47, player_impression_48, player_impression_49, player_impression_50, 
+                                                    impression_player_1, impression_player_2, impression_player_3, impression_player_4, impression_player_5, impression_player_6, impression_player_7, impression_player_8, impression_player_9, impression_player_10, 
+                                                    impression_player_11, impression_player_12, impression_player_13, impression_player_14, impression_player_15, impression_player_16, impression_player_17, impression_player_18, impression_player_19, impression_player_20, 
+                                                    impression_player_21, impression_player_22, impression_player_23, impression_player_24, impression_player_25, impression_player_26, impression_player_27, impression_player_28, impression_player_29, impression_player_30, 
+                                                    impression_player_31, impression_player_32, impression_player_33, impression_player_34, impression_player_35, impression_player_36, impression_player_37, impression_player_38, impression_player_39, impression_player_40, 
+                                                    impression_player_41, impression_player_42, impression_player_43, impression_player_44, impression_player_45, impression_player_46, impression_player_47, impression_player_48, impression_player_49, impression_player_50, 
+                                                    impression_scene_1, impression_scene_2, impression_scene_3, impression_scene_4, impression_scene_5, impression_scene_6, impression_scene_7, impression_scene_8, impression_scene_9, impression_scene_10, 
+                                                    impression_scene_11, impression_scene_12, impression_scene_13, impression_scene_14, impression_scene_15, impression_scene_16, impression_scene_17, impression_scene_18, impression_scene_19, impression_scene_20, 
+                                                    impression_scene_21, impression_scene_22, impression_scene_23, impression_scene_24, impression_scene_25, impression_scene_26, impression_scene_27, impression_scene_28, impression_scene_29, impression_scene_30, 
+                                                    impression_scene_31, impression_scene_32, impression_scene_33, impression_scene_34, impression_scene_35, impression_scene_36, impression_scene_37, impression_scene_38, impression_scene_39, impression_scene_40, 
+                                                    impression_scene_41, impression_scene_42, impression_scene_43, impression_scene_44, impression_scene_45, impression_scene_46, impression_scene_47, impression_scene_48, impression_scene_49, impression_scene_50,                                                     
                                                     impression_final,
-                                                    related_performance[1], related_performance[2], related_performance[3], related_performance[4], related_performance[5], related_performance[6], related_performance[7], related_performance[8], related_performance[9], related_performance[10],
-                                                    VALUES (userid=:userid, performance=:performance, theater=:theater, date=:date, open_time=:open_time, close_time=:close_time, stage=:stage, seat=:seat,
-                                                            first_day=:first_day, final_day=:final_day, organizer=:organizer, director=:director, author=:author, dance=:dance,
-                                                            music=:music, lyrics=:lyrics, cloth=:cloth, light=:light, property=:property, players=:players, scenario=:scenario, impression_all=:impression_all,
-                                                            player_impression[1]=:player_impression[1], player_impression[2]=:player_impression[2], player_impression[3]=:player_impression[3], player_impression[4]=:player_impression[4], player_impression[5]=:player_impression[5], 
-                                                            player_impression[6]=:player_impression[6], player_impression[7]=:player_impression[7], player_impression[8]=:player_impression[8], player_impression[9]=:player_impression[9], player_impression[10]=:player_impression[10], 
-                                                            player_impression[11]=:player_impression[11], player_impression[12]=:player_impression[12], player_impression[13]=:player_impression[13], player_impression[14]=:player_impression[14], player_impression[15]=:player_impression[15], 
-                                                            player_impression[16]=:player_impression[16], player_impression[17]=:player_impression[17], player_impression[18]=:player_impression[18], player_impression[19]=:player_impression[19], player_impression[20]=:player_impression[20], 
-                                                            player_impression[21]=:player_impression[21], player_impression[22]=:player_impression[22], player_impression[23]=:player_impression[23], player_impression[24]=:player_impression[24], player_impression[25]=:player_impression[25], 
-                                                            player_impression[26]=:player_impression[26], player_impression[27]:=player_impression[27], player_impression[28]=:player_impression[28], player_impression[29]=:player_impression[29], player_impression[30]=:player_impression[30], 
-                                                            player_impression[31]=:player_impression[31], player_impression[32]=:player_impression[32], player_impression[33]=:player_impression[33], player_impression[34]=:player_impression[34], player_impression[35]=:player_impression[35], 
-                                                            player_impression[36]=:player_impression[36], player_impression[37]=:player_impression[37], player_impression[38]=:player_impression[38], player_impression[39]=:player_impression[39], player_impression[40]=:player_impression[40], 
-                                                            player_impression[41]=:player_impression[41], player_impression[42]=:player_impression[42], player_impression[43]=:player_impression[43], player_impression[44]=:player_impression[44], player_impression[45]=:player_impression[45], 
-                                                            player_impression[46]=:player_impression[46], player_impression[47]=:player_impression[47], player_impression[48]=:player_impression[48], player_impression[49]=:player_impression[49], player_impression[50]=:player_impression[50], 
-                                                            impression_player[1]=:impression_player[1], impression_player[2]=:impression_player[2], impression_player[3]=:impression_player[3], impression_player[4]=:impression_player[4], impression_player[5]=:impression_player[5], 
-                                                            impression_player[6]=:impression_player[6], impression_player[7]=:impression_player[7], impression_player[8]=:impression_player[8], impression_player[9]=:impression_player[9], impression_player[10]=:impression_player[10], 
-                                                            impression_player[11]=:impression_player[11], impression_player[12]=:impression_player[12], impression_player[13]=:impression_player[13], impression_player[14]=:impression_player[14], impression_player[15]=:impression_player[15], 
-                                                            impression_player[16]=:impression_player[16], impression_player[17]=:impression_player[17], impression_player[18]=:impression_player[18], impression_player[19]=:impression_player[19], impression_player[20]=:impression_player[20], 
-                                                            impression_player[21]=:impression_player[21], impression_player[22]=:impression_player[22], impression_player[23]=:impression_player[23], impression_player[24]=:impression_player[24], impression_player[25]=:impression_player[25], 
-                                                            impression_player[26]=:impression_player[26], impression_player[27]:=impression_player[27], impression_player[28]=:impression_player[28], impression_player[29]=:impression_player[29], impression_player[30]=:impression_player[30], 
-                                                            impression_player[31]=:impression_player[31], impression_player[32]=:impression_player[32], impression_player[33]=:impression_player[33], impression_player[34]=:impression_player[34], impression_player[35]=:impression_player[35], 
-                                                            impression_player[36]=:impression_player[36], impression_player[37]=:impression_player[37], impression_player[38]=:impression_player[38], impression_player[39]=:impression_player[39], impression_player[40]=:impression_player[40], 
-                                                            impression_player[41]=:impression_player[41], impression_player[42]=:impression_player[42], impression_player[43]=:impression_player[43], impression_player[44]=:impression_player[44], impression_player[45]=:impression_player[45], 
-                                                            impression_player[46]=:impression_player[46], impression_player[47]=:impression_player[47], impression_player[48]=:impression_player[48], impression_player[49]=:impression_player[49], impression_player[50]=:impression_player[50],
-                                                            impression_final=:impression_final,
-                                                            related_performance[1]=:related_performance[1], related_performance[2]=:related_performance[2], related_performance[3]=:related_performance[3], related_performance[4]=:related_performance[4], related_performance[5]=:related_performance[5], 
-                                                            related_performance[6]=:related_performance[6], related_performance[7]=:related_performance[7], related_performance[8]=:related_performance[8], related_performance[9]=:related_performance[9], related_performance[10]=:related_performance[10])");
-                 
-                     $stmt_add = $pdo -> prepare($sql_add);
-                     $stmt_add -> bindParam(':userid', $userid, PDO::PARAM_INT);
-                     $stmt_add -> bindParam(':performance', $performance, PDO::PARAM_STR);
-                     $stmt_add -> bindParam(':theater', $theater, PDO::PARAM_STR);
-                     $stmt_add -> bindParam(':date', $date, PDO::PARAM_STR);
-                     $stmt_add -> bindParam(':open_time', $open_time, PDO::PARAM_STR);
-                     $stmt_add -> bindParam(':close_time', $close_time, PDO::PARAM_STR);
-                     $stmt_add -> bindParam(':stage', $stage, PDO::PARAM_STR);
-                     $stmt_add -> bindParam(':seat', $seat, PDO::PARAM_STR);
-                     $stmt_add -> bindParam(':first_date', $first_date, PDO::PARAM_STR);
-                     $stmt_add -> bindParam(':final_date', $final_date, PDO::PARAM_STR);
-                     $stmt_add -> bindParam(':organizer', $organizer, PDO::PARAM_STR);
-                     $stmt_add -> bindParam(':director', $director, PDO::PARAM_STR);
-                     $stmt_add -> bindParam(':author', $author, PDO::PARAM_STR);
-                     $stmt_add -> bindParam(':dance', $dance, PDO::PARAM_STR);
-                     $stmt_add -> bindParam(':music', $music, PDO::PARAM_STR);
-                     $stmt_add -> bindParam(':lyrics', $lyrics, PDO::PARAM_STR);
-                     $stmt_add -> bindParam(':cloth', $cloth, PDO::PARAM_STR);
-                     $stmt_add -> bindParam(':light', $light, PDO::PARAM_STR);
-                     $stmt_add -> bindParam(':property', $property, PDO::PARAM_STR);
-                     $stmt_add -> bindParam(':players', $players, PDO::PARAM_STR);
-                     $stmt_add -> bindParam(':scenario', $scenario, PDO::PARAM_STR);
-                     $stmt_add -> bindParam(':impression_all', $impression_all, PDO::PARAM_STR);
-                         for($i=1; $i<51; $i++){
-                             $stmt_add -> bindParam(':player_impression['.$i.']', $player_impression[$i], PDO::PARAM_STR);
-                             $stmt_add -> bindParam(':impression_player['.$i.']', $impression_player[$i], PDO::PARAM_STR);
-                             if($i<11){
-                                 $stmt_add -> bindParam(':related_performance['.$i.']', $related_performance[$i], PDO::PARAM_STR);
-                             }
+                                                    related_performance_1, related_performance_2, related_performance_3, related_performance_4, related_performance_5, related_performance_6, related_performance_7, related_performance_8, related_performance_9, related_performance_10)
+                                                    VALUES (:userid, :performance, :theater, :date, :open_time, :close_time, :stage, :seat,
+                                                            :first_date, :final_date, :organizer, :director, :author, :dance,
+                                                            :music, :lyrics, :cloth, :light, :property, :players, :scenario, :impression_all,
+                                                            :player_impression_1, :player_impression_2, :player_impression_3, :player_impression_4, :player_impression_5, :player_impression_6, :player_impression_7, :player_impression_8, :player_impression_9, :player_impression_10, 
+                                                            :player_impression_11, :player_impression_12, :player_impression_13, :player_impression_14, :player_impression_15, :player_impression_16, :player_impression_17, :player_impression_18, :player_impression_19, :player_impression_20, 
+                                                            :player_impression_21, :player_impression_22, :player_impression_23, :player_impression_24, :player_impression_25, :player_impression_26, :player_impression_27, :player_impression_28, :player_impression_29, :player_impression_30, 
+                                                            :player_impression_31, :player_impression_32, :player_impression_33, :player_impression_34, :player_impression_35, :player_impression_36, :player_impression_37, :player_impression_38, :player_impression_39, :player_impression_40, 
+                                                            :player_impression_41, :player_impression_42, :player_impression_43, :player_impression_44, :player_impression_45, :player_impression_46, :player_impression_47, :player_impression_48, :player_impression_49, :player_impression_50, 
+                                                            :impression_player_1, :impression_player_2, :impression_player_3, :impression_player_4, :impression_player_5, :impression_player_6, :impression_player_7, :impression_player_8, :impression_player_9, :impression_player_10, 
+                                                            :impression_player_11, :impression_player_12, :impression_player_13, :impression_player_14, :impression_player_15, :impression_player_16, :impression_player_17, :impression_player_18, :impression_player_19, :impression_player_20, 
+                                                            :impression_player_21, :impression_player_22, :impression_player_23, :impression_player_24, :impression_player_25, :impression_player_26, :impression_player_27, :impression_player_28, :impression_player_29, :impression_player_30, 
+                                                            :impression_player_31, :impression_player_32, :impression_player_33, :impression_player_34, :impression_player_35, :impression_player_36, :impression_player_37, :impression_player_38, :impression_player_39, :impression_player_40, 
+                                                            :impression_player_41, :impression_player_42, :impression_player_43, :impression_player_44, :impression_player_45, :impression_player_46, :impression_player_47, :impression_player_48, :impression_player_49, :impression_player_50, 
+                                                            :impression_scene_1, :impression_scene_2, :impression_scene_3, :impression_scene_4, :impression_scene_5, :impression_scene_6, :impression_scene_7, :impression_scene_8, :impression_scene_9, :impression_scene_10, 
+                                                            :impression_scene_11, :impression_scene_12, :impression_scene_13, :impression_scene_14, :impression_scene_15, :impression_scene_16, :impression_scene_17, :impression_scene_18, :impression_scene_19, :impression_scene_20, 
+                                                            :impression_scene_21, :impression_scene_22, :impression_scene_23, :impression_scene_24, :impression_scene_25, :impression_scene_26, :impression_scene_27, :impression_scene_28, :impression_scene_29, :impression_scene_30, 
+                                                            :impression_scene_31, :impression_scene_32, :impression_scene_33, :impression_scene_34, :impression_scene_35, :impression_scene_36, :impression_scene_37, :impression_scene_38, :impression_scene_39, :impression_scene_40, 
+                                                            :impression_scene_41, :impression_scene_42, :impression_scene_43, :impression_scene_44, :impression_scene_45, :impression_scene_46, :impression_scene_47, :impression_scene_48, :impression_scene_49, :impression_scene_50,                                                     
+                                                            :impression_final,
+                                                            :related_performance_1, :related_performance_2, :related_performance_3, :related_performance_4, :related_performance_5, :related_performance_6, :related_performance_7, :related_performance_8, :related_performance_9, :related_performance_10)");
+                    
+                     $sql_add -> bindParam(':userid', $userid, PDO::PARAM_INT);
+                     $sql_add -> bindParam(':performance', $performance, PDO::PARAM_STR);
+                     $sql_add -> bindParam(':theater', $theater, PDO::PARAM_STR);
+                     $sql_add -> bindParam(':date', $date, PDO::PARAM_STR);
+                     $sql_add -> bindParam(':open_time', $open_time, PDO::PARAM_STR);
+                     $sql_add -> bindParam(':close_time', $close_time, PDO::PARAM_STR);
+                     $sql_add -> bindParam(':stage', $stage, PDO::PARAM_STR);
+                     $sql_add -> bindParam(':seat', $seat, PDO::PARAM_STR);
+                     $sql_add -> bindParam(':first_date', $first_date, PDO::PARAM_STR);
+                     $sql_add -> bindParam(':final_date', $final_date, PDO::PARAM_STR);
+                     $sql_add -> bindParam(':organizer', $organizer, PDO::PARAM_STR);
+                     $sql_add -> bindParam(':director', $director, PDO::PARAM_STR);
+                     $sql_add -> bindParam(':author', $author, PDO::PARAM_STR);
+                     $sql_add -> bindParam(':dance', $dance, PDO::PARAM_STR);
+                     $sql_add -> bindParam(':music', $music, PDO::PARAM_STR);
+                     $sql_add -> bindParam(':lyrics', $lyrics, PDO::PARAM_STR);
+                     $sql_add -> bindParam(':cloth', $cloth, PDO::PARAM_STR);
+                     $sql_add -> bindParam(':light', $light, PDO::PARAM_STR);
+                     $sql_add -> bindParam(':property', $property, PDO::PARAM_STR);
+                     $sql_add -> bindParam(':players', $players, PDO::PARAM_STR);
+                     $sql_add -> bindParam(':scenario', $scenario, PDO::PARAM_STR);
+                     $sql_add -> bindParam(':impression_all', $impression_all, PDO::PARAM_STR);
+                     for($i=1; $i<51; $i++){
+                         $sql_add -> bindParam(":player_impression_{$i}", $player_impression[$i], PDO::PARAM_STR);
+                         $sql_add -> bindParam(":impression_player_{$i}", $impression_player[$i], PDO::PARAM_STR);
+                         $sql_add -> bindParam(":impression_scene_{$i}", $impression_scene[$i], PDO::PARAM_STR);
+                         if($i<11){
+                             $sql_add -> bindParam("related_performance_{$i}", $related_performance[$i], PDO::PARAM_STR);
                          }
-                     $stmt_add -> bindParam(':impression_final', $impression_final, PDO::PARAM_STR);
-                     $stmt_add -> execute();
+                     }
+                     $sql_add -> bindParam(':impression_final', $impression_final, PDO::PARAM_STR);
+                     
+                     $sql_add -> execute();
                      
                      $_SESSION = array();
                      $_SESSION['userid'] = $userid;
@@ -332,17 +324,17 @@
          <?php endif; ?>
      <?php elseif($flag === 1 || isset($_POST['btn_back'])): ?>
                  <form action="" method="post" enctype="multipart/form-data">
-				   <p>公演：<input type="text" name="performance" value="<?php if( !empty($_SESSION['peformance']) ){ echo $_SESSION['peformance']; } ?>"></p>
+				   <p>公演：<input type="text" name="performance" value="<?php if( !empty($_SESSION['performance']) ){ echo $_SESSION['performance']; } ?>"></p>
 				   <p>劇団：<input type="text" name="theater" value="<?php if( !empty($_SESSION['theater']) ){ echo $_SESSION['theater']; } ?>"></p>
 				   <p>観劇日：<input type="date" name="date" value="<?php if( !empty($_SESSION['date']) ){ echo $_SESSION['date']; }else{ echo "2021-07-04"; } ?>"></p>
-				   <p>開演時刻：<input type="time" name="open_time" value="<?php if( !empty($_SESSION['open_time']) ){ echo $_SESSION['open_time']; }else{ echo "13:00"; } ?>">
-				                ~ 終演時刻：<input type="time" name="close_time" value="<?php if( !empty($_SESSION['close_time']) ){ echo $_SESSION['close_time']; }else{ echo "16:00"; } ?>"></p>
+				   <p>公演時間：<input type="time" name="open_time" value="<?php if( !empty($_SESSION['open_time']) ){ echo $_SESSION['open_time']; }else{ echo "13:00"; } ?>"> ~
+				                <input type="time" name="close_time" value="<?php if( !empty($_SESSION['close_time']) ){ echo $_SESSION['close_time']; }else{ echo "16:00"; } ?>"></p>
 				   <p>観劇した劇場：<input type="text" name="stage" value="<?php if( !empty($_SESSION['stage']) ){ echo $_SESSION['stage']; } ?>"></p>
 				   <p>座席：<input type="text" name="seat" value="<?php if(!empty($_SESSION['stage'])){ echo $_SESSION['seat']; } ?>"></p>
-				   <p>公演期間：<input type="date" name="firstdate" value="<?php if( !empty($_SESSION['firstdate']) ){ echo $_SESSION['firstdate']; } ?>"> ~
-				                <input type="date" name="finaldate" value="<?php if( !empty($_SESSION['finaldate']) ){ echo $_SESSION['finaldate']; } ?>"></p>
+				   <p>公演期間：<input type="date" name="first_date" value="<?php if( !empty($_SESSION['first_date']) ){ echo $_SESSION['first_date']; } ?>"> ~
+				                <input type="date" name="final_date" value="<?php if( !empty($_SESSION['final_date']) ){ echo $_SESSION['final_date']; } ?>"></p>
 				   <p>主催：<input type="text" name="organizer" value="<?php if( !empty($_SESSION['organizer']) ){ echo $_SESSION['organizer']; } ?>"></p>
-				   <p>演出：<input type="text" name="director" value="<?php if( !empty($_SESSION['value']) ){ echo $_SESSION['value']; } ?>"></p>
+				   <p>演出：<input type="text" name="director" value="<?php if( !empty($_SESSION['director']) ){ echo $_SESSION['director']; } ?>"></p>
 				   <p>作家：<input type="text" name="author" value="<?php if( !empty($_SESSION['author']) ){ echo $_SESSION['author']; } ?>"></p>
 				   <p>振付：<input type="text" name="dance" value="<?php if( !empty($_SESSION['dance']) ){ echo $_SESSION['dance']; } ?>"></p>
                    <p>音楽：<input type="text" name="music" value="<?php if( !empty($_SESSION['music']) ){ echo $_SESSION['music']; } ?>"></p>
