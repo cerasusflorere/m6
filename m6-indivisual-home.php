@@ -26,20 +26,22 @@
          $pdo = new PDO($dsn, $user, $password, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING));
 
          $userid = isset($_SESSION['userid']) ? $_SESSION['userid'] : NULL;
-         $performance = array();
-         $count_results;
+         $performance = [];
+         $count_results = 0;
          
          try{
              $sql_home = "SELECT * FROM impression WHERE userid=:userid";
              $stmt_home = $pdo -> prepare($sql_home);
              $stmt_home -> bindParam(':userid', $userid, PDO::PARAM_INT);
+             $stmt_home -> execute();
              $results  = $stmt_home -> fetchAll();
          
              if(is_array($results)){
-                 $count_results = 0;
-                 foreach($results as $row){
-                     $count_results++;
-                     $performance[$count_results] = $row['performance'];
+                foreach($results as $row){
+                     if(isset($row['performance'])){
+                         $count_results++;
+                         $performance[$count_results] = $row['performance'];
+                     }
                  }
              }
          }catch(PDOException $e){
@@ -58,19 +60,21 @@
              exit();
          }
      ?>
-     
-     <form action="" method="post">
-         <?php if($count_results >= 1): ?>
+    
+         <?php if($count_results > 0): ?>
              <?php for($i=1; $i<=$count_results; $i++){ ?>
-                 <p><?php echo $i.":" ?>
-                 <input type="hidden" name="performance_name" value="<?php echo $performance[$i] ?>">
-                 <a href="m6-indivisual-subject-show.php"><?php echo $performance[$i] ?></a></p>
+                 <form action="m6-indivisual-subject-show.php" method="post" name="<?php echo $performance[$i]; ?>">
+                     <p><?php echo $i.":"; ?>
+                     <a href="m6-indivisual-subject-show.php" onClick="<?php echo 'document.'.$performance[$i].'.submit();return false;' ?>"><?php echo $performance[$i]; ?></a></p>
+                     <input type=hidden name="performance_name" value="<?php echo $performance[$i]; ?>">
+                 </form>
              <?php } ?>
          <?php else :
-                 echo "データありません。<br>";
+                 echo "データがありません。<br>";
                endif; ?>
+     <form action="" method="post">
          <input type="submit" name="btn_add" value="追加する">
          <p><a href = "m6-logout.php">ログアウトはこちら</a></p>
          <p><a href = "m6-withdrow.php">退会する</a></p>
      </form>
-</html>  
+</html> 
