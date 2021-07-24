@@ -28,6 +28,7 @@
          $pdo = new PDO($dsn, $user, $password, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING));
          
          $errors = [];
+         $sucess = "";
          $flag = 0;
          $stages_array = [];
          $numbers = 0;
@@ -205,6 +206,8 @@
                      
                      $_SESSION = array();
                      $_SESSION['userid'] = $userid;
+                     
+                     $sucess = "追記されました。";
                  }catch(PDOException $e){
                      //トランザクション取り消し
                      $pdo -> rollBack();
@@ -236,7 +239,9 @@
 ?>     
 
 <script>
+     //javascript認識確認
      console.log("Samurai");
+     //本体
      $(function(){
          //buttun
          var add_player = $('.add-player');
@@ -245,11 +250,13 @@
          
          //出演者に対する感想
          add_player.click(function(){
-             var text = $('.text').last();
-             text
-                 .clone(); //クローン
-                 .val(''); //valueもクローンされるので削除
-                 .insertAfter(text); //inputを最後尾に追加
+             var text_player = ''+
+             '<p>' +
+             '出演者：<input type="text" name="player_impression_[]" class = "text" value=""' + 
+				      '出演者に対するコメント：<input type="text" name="impression_player_[]" value="">' +
+	         '<p>';
+			 
+			 $(text_player).appendTo($('p > bottun'));
          });
      });  
 </script>
@@ -260,7 +267,7 @@
      <h1>楽しかった公演の記録をどうぞ！</h1>
    <!-- page3 完了画面 -->
      <?php if(count($errors) === 0 && isset($_POST['btn_submit'])): ?>
-   　     追記されました。
+         <?php echo $sucess.PHP_EOL; ?>  　    
    　<p>ホーム<a href="m6-indivisual-home.php">こちら</a></p>
    　
    <!-- page2 確認画面 -->
@@ -337,8 +344,8 @@
 				   <p>演出：<input type="text" name="director" value="<?php if( !empty($_SESSION['director']) ){ echo $_SESSION['director']; } ?>"></p>
 				   <p>作家：<input type="text" name="author" value="<?php if( !empty($_SESSION['author']) ){ echo $_SESSION['author']; } ?>"></p>
 				   <p>振付：<input type="text" name="dance" value="<?php if( !empty($_SESSION['dance']) ){ echo $_SESSION['dance']; } ?>"></p>
-                   <p>音楽：<input type="text" name="music" value="<?php if( !empty($_SESSION['music']) ){ echo $_SESSION['music']; } ?>"></p>
-                   <p>作詞：<input type="text" name="lyrics" value="<?php if( !empty($_SESSION['lyrics']) ){ echo $_SESSION['lyrics']; } ?>"></p>
+                                   <p>音楽：<input type="text" name="music" value="<?php if( !empty($_SESSION['music']) ){ echo $_SESSION['music']; } ?>"></p>
+                                   <p>作詞：<input type="text" name="lyrics" value="<?php if( !empty($_SESSION['lyrics']) ){ echo $_SESSION['lyrics']; } ?>"></p>
 				   <p>衣装：<input type="text" name="cloth" value="<?php if( !empty($_SESSION['cloth']) ){ echo $_SESSION['cloth']; } ?>"></p>
 				   <p>照明：<input type="text" name="light" value="<?php if( !empty($_SESSION['light']) ){ echo $_SESSION['light']; } ?>"></p>
 				   <p>小道具：<input type="text" name="property" value="<?php if( !empty($_SESSION['property']) ){ echo $_SESSION['property']; } ?>"></p>
